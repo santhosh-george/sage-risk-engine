@@ -1,0 +1,2 @@
+# sage-risk-engine
+The SaGe Risk Engine is a flexible data driven engine to calculate risk scores based on CMS HCC, RX, and ESRD models from 2016 through current model years. The engine is developed for the Amazon Redshift platform. PostgreSQL and MySQL versions are also available. Avoid SAS and calculate the score using the SaGe Risk Engine in the cloud (Redshift) or database on your local machine (MySQL / PostgreSQL)
