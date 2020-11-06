@@ -1,12 +1,10 @@
-## Welcome to GitHub Pages
+## What is SaGe Risk Engine?
 
-You can use the [editor on GitHub](https://github.com/santhosh-george/sage-risk-engine/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+If you are a Medicare advantage plan you care about risk scores for your enrollees. Calculation of the HCC risk scores is what this engine can do. The SaGe Risk Engine calculates all the active risk model versions: V05, V21, V22, V24.  
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Where do I find information on the Risk Models?
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Center for Medicare and Medicaid publishes the Risk adjustment models. These models are developed for the different Model Years. For more information refer to: https://www.cms.gov/Medicare/Health-Plans/MedicareAdvtgSpecRateStats/Risk-Adjustors
 
 ```markdown
 Syntax highlighted code block
