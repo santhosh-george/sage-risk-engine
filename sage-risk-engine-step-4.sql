@@ -10,13 +10,14 @@ DECLARE
     --sortkeysql VARCHAR(7000);
     affected_rows INTEGER;
     iHCC_VAR VARCHAR(100);
-    iCALC_TYPE VARCHAR(100);
+    --iCALC_TYPE VARCHAR(100);
     iCC INTEGER;
-    iCC_PREV INTEGER;
+    --iCC_PREV INTEGER;
+    iDIAG_CD VARCHAR(2000);
     iHCC_NUM INTEGER;
     iCALCULATION VARCHAR(max);
     iTBLNM VARCHAR(100);
-    C0 CURSOR FOR SELECT CC, CALCULATION, CALC_TYPE,CC_PREV FROM genericmodelv3.public.ME_ADDL_CC_MAP
+    C0 CURSOR FOR SELECT CC, CALCULATION, DIAG_CD FROM genericmodelv3.public.ME_ADDL_CC_MAP
     WHERE MODEL_YR = iMODEL_YR AND VRSN_NUM = iVRSN_NUM AND RUN_TYPE = iRUN_TYPE
 	ORDER BY CALC_ORDER ASC;
     C0A CURSOR FOR SELECT HCC_VARIABLE,HCC_NUM FROM genericmodelv3.public.ME_HCC_VARIABLES 
@@ -56,107 +57,51 @@ DECLARE
         ORDER BY VARIABLE;
 BEGIN                                                          
     DROP TABLE IF EXISTS genericmodelv3.public.SAGE_DIAG_EDIT;
-    IF iSEDIT = 'Y' THEN
-        iTBLNM := 'SAGE_DIAG_EDIT';
-        CREATE TABLE genericmodelv3.public.SAGE_DIAG_EDIT (HICNO VARCHAR(50), DIAG VARCHAR(10), 
+    CREATE TABLE genericmodelv3.public.SAGE_DIAG_EDIT (HICNO VARCHAR(50), DIAG VARCHAR(10), 
         PRIMARY KEY (HICNO,DIAG)) 
         DISTKEY(DIAG) SORTKEY(HICNO);
+        
+    IF iSEDIT = 'Y' THEN
         sqlstr := CONCAT('INSERT INTO genericmodelv3.public.SAGE_DIAG_EDIT (HICNO,DIAG) ',
         CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(
-            'SELECT diag.hicno, diag.diag  
-            FROM genericmodelv3.public.SAGE_DIAG diag 
-            EXCEPT
-            SELECT diag.HICNO, diag.DIAG 
-            FROM genericmodelv3.public.SAGE_DIAG diag 
-            INNER JOIN genericmodelv3.public.ME_SEDIT_AGE age 
-            ON diag.DIAG = age.DIAG_CD 
-            INNER JOIN genericmodelv3.public.SAGE_OFILE_3 ofile
-            on ofile.HICNO = diag.HICNO
-            and (ofile.AGEF_EDIT < age.AGE_LOWER or ofile.AGEF_EDIT > age.AGE_UPPER)
-            WHERE age.MODEL_YR = ',iMODEL_YR),
-            ' and age.VRSN_NUM = '''),iVRSN_NUM),'''
-            and age.RUN_TYPE = '''),iRUN_TYPE),'''
-            EXCEPT
-            SELECT diag.HICNO, diag.DIAG 
-            FROM genericmodelv3.public.SAGE_DIAG diag 
-            INNER JOIN genericmodelv3.public.ME_SEDIT_SEX sex 
-            ON diag.DIAG = sex.DIAG_CD 
-            INNER JOIN genericmodelv3.public.SAGE_OFILE_3 ofile
-            on ofile.HICNO = diag.HICNO
-            and (ofile.SEX <> sex.SEX)
-            WHERE sex.MODEL_YR = '),iMODEL_YR),
-            ' and sex.VRSN_NUM = '''),iVRSN_NUM),'''
-            and sex.RUN_TYPE = '''),iRUN_TYPE),''''));
-		EXECUTE sqlstr;
+            'SELECT diag.hicno, diag.diag FROM genericmodelv3.public.SAGE_DIAG diag EXCEPT SELECT diag.HICNO, diag.DIAG FROM genericmodelv3.public.SAGE_DIAG diag INNER JOIN genericmodelv3.public.ME_SEDIT_AGE age ON diag.DIAG = age.DIAG_CD INNER JOIN genericmodelv3.public.SAGE_OFILE_3 ofile on ofile.HICNO = diag.HICNO and (ofile.AGEF_EDIT < age.AGE_LOWER or ofile.AGEF_EDIT > age.AGE_UPPER) WHERE age.MODEL_YR = ',iMODEL_YR), ' and age.VRSN_NUM = '''),iVRSN_NUM),''' and age.RUN_TYPE = '''),iRUN_TYPE),''' EXCEPT SELECT diag.HICNO, diag.DIAG FROM genericmodelv3.public.SAGE_DIAG diag INNER JOIN genericmodelv3.public.ME_SEDIT_SEX sex ON diag.DIAG = sex.DIAG_CD INNER JOIN genericmodelv3.public.SAGE_OFILE_3 ofile on ofile.HICNO = diag.HICNO and (ofile.SEX <> sex.SEX) WHERE sex.MODEL_YR = '),iMODEL_YR),  ' and sex.VRSN_NUM = '''),iVRSN_NUM),''' and sex.RUN_TYPE = '''),iRUN_TYPE),''''));
     ELSE
-        iTBLNM := 'SAGE_DIAG';
+        sqlstr := 'INSERT INTO genericmodelv3.public.SAGE_DIAG_EDIT (HICNO,DIAG) SELECT diag.hicno, diag.diag FROM genericmodelv3.public.SAGE_DIAG diag';
     END IF;
+    RAISE NOTICE '%',sqlstr;
+    EXECUTE sqlstr;
+    
     DROP TABLE IF EXISTS SAGE_TCC;
     CREATE TABLE genericmodelv3.public.SAGE_TCC (HICNO VARCHAR(50),CC INTEGER, PRIMARY KEY (HICNO,CC)) 
     DISTKEY(HICNO) SORTKEY(CC);
-    sqlstr:='INSERT INTO genericmodelv3.public.SAGE_TCC (HICNO,CC) ';
-    sqlstr := concat(concat(concat(concat(concat(concat(concat(concat(concat(sqlstr,' select HICNO,CC 
-                    from genericmodelv3.public.'),iTBLNM),' diag inner join genericmodelv3.public.ME_CC_MAP cc
-                    on trim(diag.diag) = trim(cc.diag_cd)
-                    where model_yr = '), iMODEL_YR),'  and VRSN_NUM = '''), iVRSN_NUM),
-                    ''' and RUN_TYPE = '''),iRUN_TYPE),''' group by 1,2');
-	EXECUTE sqlstr;
     
     OPEN C0;
     LOOP
-        FETCH C0 INTO iCC,iCALCULATION,iCALC_TYPE,iCC_PREV;
+        FETCH C0 INTO iCC,iCALCULATION,iDIAG_CD;
         -- exit when no more row to fetch
         exit when not found;
-        IF iCC_PREV = 0 THEN
-            sqlstr0:= 'WITH rows AS (SELECT a.HICNO, ';
+        sqlstr0:= 'DELETE FROM SAGE_DIAG_EDIT WHERE DIAG IN ' || iDIAG_CD || ' AND HICNO IN (SELECT a.HICNO FROM genericmodelv3.public.SAGE_ofile_3 a INNER JOIN genericmodelv3.public.SAGE_DIAG_EDIT b on a.HICNO = b.HICNO WHERE ' || iCALCULATION || ')';
+            
+        IF iCC <> -1 THEN    
             sqlstr := 'INSERT INTO genericmodelv3.public.SAGE_TCC SELECT a.HICNO,';
-            sqlstr0 := concat(concat(concat(concat(concat(sqlstr0,iCC), ' from genericmodelv3.public.SAGE_ofile_3 a 
-                inner join genericmodelv3.public.'),iTBLNM),' b on a.HICNO = b.HICNO where '),iCALCULATION);
-            sqlstr := concat(concat(concat(concat(concat(sqlstr,iCC), ' from genericmodelv3.public.SAGE_ofile_3 a 
-            inner join genericmodelv3.public.'),iTBLNM), ' b on a.HICNO = b.HICNO where '),iCALCULATION);
-        ELSE
-            IF iCC = -1 THEN
-                sqlstr0:= 'WITH rows AS (SELECT a.HICNO ';
-                sqlstr := 'DELETE FROM genericmodelv3.public.SAGE_TCC WHERE CC = ' || iCC_PREV || ' AND HICNO IN (SELECT a.HICNO ';
-                sqlstr0 := concat(concat(concat(concat(concat(concat(sqlstr0, ' from genericmodelv3.public.SAGE_ofile_3 a 
-                    inner join genericmodelv3.public.'),iTBLNM),' b on a.HICNO = b.HICNO inner join genericmodelv3.public.SAGE_TCC c
-					on a.HICNO = c.HICNO where '),iCALCULATION), ' AND CC = '),iCC_PREV);
-                sqlstr := concat(concat(concat(concat(concat(concat(concat(sqlstr, ' from genericmodelv3.public.SAGE_ofile_3 a 
-                    inner join genericmodelv3.public.'),iTBLNM),' b on a.HICNO = b.HICNO inner join genericmodelv3.public.SAGE_TCC c
-					on a.HICNO = c.HICNO where '),iCALCULATION), ' AND CC = '),iCC_PREV),')');
-            ELSE
-                sqlstr0:= 'WITH rows AS (SELECT a.HICNO ';
-                sqlstr := 'UPDATE genericmodelv3.public.SAGE_TCC SET CC = ' || iCC || ' WHERE CC = ' || iCC_PREV || 
-                            ' AND HICNO IN (SELECT a.HICNO ';
-                sqlstr0 := concat(concat(concat(concat(concat(concat(sqlstr0, ' from genericmodelv3.public.SAGE_ofile_3 a 
-                    inner join genericmodelv3.public.'),iTBLNM),' b on a.HICNO = b.HICNO inner join genericmodelv3.public.SAGE_TCC c
-					on a.HICNO = c.HICNO where '),iCALCULATION), ' AND CC = '),iCC_PREV);
-                sqlstr := concat(concat(concat(concat(concat(concat(concat(sqlstr, ' from genericmodelv3.public.SAGE_ofile_3 a 
-                    inner join genericmodelv3.public.'),iTBLNM),' b on a.HICNO = b.HICNO inner join genericmodelv3.public.SAGE_TCC c
-					on a.HICNO = c.HICNO where '),iCALCULATION), ' AND CC = '),iCC_PREV),')');        
-            END IF;
-        END IF;
-        sqlstr0:= concat(sqlstr0,' ) SELECT coalesce(count(*),0) FROM rows');
-        sqlstr:= concat(sqlstr,'  ');
-		RAISE NOTICE '%',sqlstr0;
-        RAISE NOTICE '%',sqlstr;
-        EXECUTE sqlstr0 INTO affected_rows; 
-        sqlstr0 := '';
-
-        IF affected_rows > 0 THEN
+            sqlstr := concat(concat(concat(sqlstr,iCC), ' from genericmodelv3.public.SAGE_ofile_3 a inner join genericmodelv3.public.SAGE_DIAG_EDIT b on a.HICNO = b.HICNO where '),iCALCULATION);
+			RAISE NOTICE '%',sqlstr;
             EXECUTE sqlstr;
-            sqlstr = '';
-            IF iCALC_TYPE = 'ELSE' THEN 
-                exit;
-            END IF;
         END IF;
+        RAISE NOTICE '%',sqlstr0;
+        EXECUTE sqlstr0;
+        
     END LOOP;
     CLOSE C0;
+    
+    
+    sqlstr:='INSERT INTO genericmodelv3.public.SAGE_TCC (HICNO,CC) ';
+    sqlstr := concat(concat(concat(concat(concat(concat(concat(sqlstr,' select HICNO,CC from genericmodelv3.public.SAGE_DIAG_EDIT diag inner join genericmodelv3.public.ME_CC_MAP cc on trim(diag.diag) = trim(cc.diag_cd) where model_yr = '), iMODEL_YR),'  and VRSN_NUM = '''), iVRSN_NUM), ''' and RUN_TYPE = '''),iRUN_TYPE),''' group by 1,2');
+	EXECUTE sqlstr;
                                                                                             
 	TRUNCATE TABLE genericmodelv3.public.SAGE_OFILE_4;
     sqlstr1 := 'INSERT INTO genericmodelv3.public.SAGE_OFILE_4 (MODEL_YR, VRSN_NUM, RUN_TYPE ';
-    sqlstr2 := concat('SELECT ',concat(iMODEL_YR,concat(' AS MODEL_YR,''',
-      concat(iVRSN_NUM, concat(''' AS VRSN_NUM,''', concat(iRUN_TYPE, ''' AS RUN_TYPE '))))));
+    sqlstr2 := concat('SELECT ',concat(iMODEL_YR,concat(' AS MODEL_YR,''', concat(iVRSN_NUM, concat(''' AS VRSN_NUM,''', concat(iRUN_TYPE, ''' AS RUN_TYPE '))))));
     sqlstr3 := ' GROUP BY MODEL_YR, VRSN_NUM, RUN_TYPE';
 	OPEN C1;
     LOOP 
