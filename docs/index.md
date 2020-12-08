@@ -4,7 +4,7 @@ If you are a Medicare advantage plan you care about risk adjustment factors (sco
 
 ## Where do I find information on the Risk Models?
 
-Center for Medicare and Medicaid publishes the Risk adjustment models. These models are developed for the different Model Years. For more information <a href= "https://www.cms.gov/Medicare/Health-Plans/MedicareAdvtgSpecRateStats/Risk-Adjustors">click here</a>
+Center for Medicare and Medicaid publishes the Risk adjustment models. These models are developed for the different Model Years. For more information <a href= "https://www.cms.gov/Medicare/Health-Plans/MedicareAdvtgSpecRateStats/Risk-Adjustors" target="_blank">click here</a>
 
 ## Why use SaGe Risk Engine?
 
