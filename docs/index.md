@@ -9,3 +9,7 @@ Center for Medicare and Medicaid publishes the Risk adjustment models. These mod
 ## Why use SaGe Risk Engine?
 
 Avoid the expenses with SAS and use the flexible data driven model solution to calculate the RAF. 
+
+## License
+
+SaGe Risk Engine is licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0). See LICENSE.md for more info.
