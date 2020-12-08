@@ -1,5 +1,9 @@
-CREATE OR REPLACE PROCEDURE genericmodelv3.public.SAGE_MEP_WRAPPER (iMODEL_YR IN INTEGER,iVRSN_NUM IN VARCHAR(10),iRUN_TYPE IN VARCHAR(20),iREF_DT IN DATE,iSEDIT IN CHAR(1),iREF_EDIT_DT IN DATE) AS $$
+CREATE OR REPLACE PROCEDURE genericmodelv3.public.SAGE_MEP_WRAPPER (iMODEL_YR IN INTEGER,iVRSN_NUM IN VARCHAR(10),iREF_DT IN DATE,iSEDIT IN CHAR(1),iREF_EDIT_DT IN DATE) AS $$
 BEGIN
+DECLARE iRUN_TYPE VARCHAR(20);
+
+IF iMODEL_YR = 2020 THEN iRUN_TYPE = 'Mid-year';
+IF iMODEL_YR = 2021 THEN iRUN_TYPE = 'Initial';
 --Create oFile Structure with all Variables from Model
 call genericmodelv3.public.SAGE_MEP_STEP_1 (iMODEL_YR,iVRSN_NUM,iRUN_TYPE);
 --Insert the Person file into the oFile
@@ -14,8 +18,7 @@ call  genericmodelv3.public.SAGE_MEP_STEP_5 (iMODEL_YR,iVRSN_NUM,iRUN_TYPE);
 call  genericmodelv3.public.SAGE_MEP_STEP_6 (iMODEL_YR,iVRSN_NUM,iRUN_TYPE);
 --Calculate score for the model
 call  genericmodelv3.public.SAGE_MEP_STEP_7 (iMODEL_YR,iVRSN_NUM,iRUN_TYPE);    
---Show results
---select * from genericmodelv3.public.SAGE_OFILE;
+
 END;
 $$
 LANGUAGE plpgsql;
