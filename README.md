@@ -6,7 +6,7 @@ The SaGe Risk Engine is a flexible data driven engine to calculate the risk adju
 2. Upload the .txt files in model-settings folder to S3 bucket and apply IAM role for Redshift to access the S3 bucket
 3. There are sample person and diag files that could be used to try the engine. If using the sample data in the sample-data folder upload the .txt files to the S3 bucket. When using your data use your data in similar structure. If the structure is different make necessary changes to me_person table found in sage-risk-engine-step-0.sql. One requirement to have the bene id to be identified as HICNO column 
 4. Modify the URL for S3 bucket and IAM role in sage-risk-engine-step-0.sql 
-5. Create stored procedures by running the script in sage-risk-engine-step-0.sql through sage-risk-engine-step-7.sql one at a time
+5. Create stored procedures by running the script in sage-risk-engine-step-0.sql through sage-risk-engine-step-7.sql one at a time. The scripts can be found in the code folder
 6. Create wrapper stored procedure by running the script in sage-risk-engine-wrapper.sql
 7. Run the following command to populate the engine parameters:
    call genericmodelv3.public.SAGE_MEP_STEP_0(); 
