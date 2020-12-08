@@ -1,5 +1,8 @@
-/* The SaGe Risk Engine was originally developed by Santhosh George (santhosh-george). This file is part of SaGe Risk Engine, a free-software/open-source library
- for calculation of risk adjustment factors (risk scores)
+/* The SaGe Risk Engine was originally developed by Santhosh George (santhosh-george). This file is part of SaGe Risk Engine, a free-software/open-source 
+library for calculation of risk adjustment factors (risk scores)
  
- This program is distributed on the basis that it will form a useful contribution to calculation of risk adjustment factors (RAF), as-is and as-available, and makes no representations or warranties of any kind whether express, implied, statutory, or other. This includes, without limitation, warranties of title, merchantability, fitness for a particular purpose, non-infringement, absence of latent or other defects, accuracy, or the presence or absence of errors, whether or not known or discoverable. . See the license for more details.
+ This program is distributed on the basis that it will form a useful contribution to calculation of risk adjustment factors (RAF), as-is and as-available, 
+ and makes no representations or warranties of any kind whether express, implied, statutory, or other. This includes, without limitation, warranties of title, 
+ merchantability, fitness for a particular purpose, non-infringement, absence of latent or other defects, accuracy, or the presence or absence of errors, 
+ whether or not known or discoverable. . See the license for more details.
 */
