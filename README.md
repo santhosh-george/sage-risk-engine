@@ -2,4 +2,4 @@ The SaGe Risk Engine is a flexible data driven engine to calculate the risk adju
 
 <strong>License</strong>
 
-SaGe Risk Engine is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0). See LICENSE.md for more info.
+SaGe Risk Engine is licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0). See LICENSE.md for more info.
